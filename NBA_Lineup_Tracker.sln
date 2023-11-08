@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "NBA_Lineup_Tracker", "NBA_Lineup_Tracker\NBA_Lineup_Tracker.pyproj", "{36150E94-0E35-4C59-9D2C-A0843F8D09BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36150E94-0E35-4C59-9D2C-A0843F8D09BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36150E94-0E35-4C59-9D2C-A0843F8D09BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {728B00AF-26A7-4D7A-9657-9D8D9B551AD9}
+	EndGlobalSection
+EndGlobal
