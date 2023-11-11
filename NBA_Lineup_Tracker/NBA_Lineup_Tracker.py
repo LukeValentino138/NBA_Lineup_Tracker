@@ -1,44 +1,41 @@
-from nba_api.stats.endpoints import leagueleaders
-from nba_api.stats.endpoints import playergamelog
-from nba_api.stats.static import players
-import pandas as pd
-import plotly.express as px
-from nba_api.stats.endpoints import playbyplay
-import pandas as pd
-from nba_api.stats.endpoints import leaguegamefinder
+from nba_api.stats.endpoints import leaguegamefinder, boxscoretraditionalv2
 from nba_api.stats.static import teams
+import pandas as pd
 
-# Get the team ID for a specific team
-team_dict = teams.get_teams()
-# Example: Find the team ID for the Los Angeles Lakers
-hornets = [team for team in team_dict if team['full_name'] == 'Charlotte Hornets'][0]
-hornets_id = hornets['id']
+def get_game_id(team_name, game_date):
+    # Fetch team data
+    team_dict = teams.get_teams()
+    team = [team for team in team_dict if team['full_name'] == team_name][0]
+    team_id = team['id']
 
-# Use LeagueGameFinder to query past games for the Lakers
-gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=hornets_id)
-games = gamefinder.get_data_frames()[0]
+    # Find games for the team
+    gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=team_id)
+    games = gamefinder.get_data_frames()[0]
 
-# Now you can filter the games DataFrame for the game you want using criteria like date or opponent
-# Example: Find a game against the Miami Heat on a specific date
-games_filtered = games[(games['GAME_DATE'] == '2023-11-06')]
+    # Filter games by date
+    games_filtered = games[games['GAME_DATE'] == game_date]
+    if not games_filtered.empty:
+        return games_filtered['GAME_ID'].values[0]
+    else:
+        return None
 
-# Now you can filter the games DataFrame for the game you want using criteria like date or opponent
-# Example: Find a game against the Miami Heat on a specific date
-games_filtered = games[(games['GAME_DATE'] == '2023-11-05')]
+def get_starting_lineup(game_id):
+    # Fetch the box score data for the specified game
+    boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
+    player_stats = boxscore.player_stats.get_data_frame()
 
-# Check if any games were found
-if not games_filtered.empty:
-    # Retrieve the GAME_ID
-    game_id = games_filtered['GAME_ID'].values[0]
-    print(game_id)
+    # Filter the data to get the starting lineup
+    starting_lineup = player_stats[player_stats['START_POSITION'] != '']
 
-    # Retrieve play-by-play data for a specific game
-    pbp = playbyplay.PlayByPlay(game_id=game_id).get_data_frames()[0]
+    # Extract and print the names of the starting players
+    for index, player in starting_lineup.iterrows():
+        print(f"{player['PLAYER_NAME']} - {player['TEAM_ABBREVIATION']} - {player['START_POSITION']}")
 
-    # Filter out the events that indicate players entering or leaving the game
-    substitutions = pbp[pbp['EVENTMSGTYPE'] == 8]
+team_name = 'Charlotte Hornets'  
+game_date = '2023-11-10'         
 
-    # Display the substitutions to see when players enter and leave
-    print(substitutions[['PERIOD', 'PCTIMESTRING', 'HOMEDESCRIPTION', 'VISITORDESCRIPTION']])
+game_id = get_game_id(team_name, game_date)
+if game_id:
+    get_starting_lineup(game_id)
 else:
-    print("No games were found for the specified criteria.")
+    print("No game found for the specified team and date")
