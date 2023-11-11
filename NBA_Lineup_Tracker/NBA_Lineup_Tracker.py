@@ -1,4 +1,4 @@
-from nba_api.stats.endpoints import leaguegamefinder, boxscoretraditionalv2
+from nba_api.stats.endpoints import leaguegamefinder, boxscoretraditionalv2, playbyplay
 from nba_api.stats.static import teams
 import pandas as pd
 
@@ -31,11 +31,24 @@ def get_starting_lineup(game_id):
     for index, player in starting_lineup.iterrows():
         print(f"{player['PLAYER_NAME']} - {player['TEAM_ABBREVIATION']} - {player['START_POSITION']}")
 
+def get_substitution_data(game_id):
+     # Retrieve play-by-play data for a specific game
+    pbp = playbyplay.PlayByPlay(game_id=game_id).get_data_frames()[0]
+
+    # Filter out the events that indicate players entering or leaving the game
+    substitutions = pbp[pbp['EVENTMSGTYPE'] == 8]
+
+    # Display the substitutions to see when players enter and leave
+    print(substitutions[['PERIOD', 'PCTIMESTRING', 'HOMEDESCRIPTION', 'VISITORDESCRIPTION']])
+
 team_name = 'Charlotte Hornets'  
 game_date = '2023-11-10'         
 
 game_id = get_game_id(team_name, game_date)
 if game_id:
+    print("Starting Lineups")
     get_starting_lineup(game_id)
+    print("Substitutions")
+    get_substitution_data(game_id)
 else:
     print("No game found for the specified team and date")
